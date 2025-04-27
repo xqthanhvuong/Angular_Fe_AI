@@ -1,25 +1,38 @@
-<div>
+<div class="container">
   <h1>Nhận diện khuôn mặt</h1>
 
-  <!-- Camera capture component -->
-  <app-camera-capture (onCapture)="captureImage($event)"></app-camera-capture>
+  <div class="row">
+    <!-- Camera -->
+    <div class="card">
+      <h2><span>📷</span> Camera Capture</h2>
+      <app-camera-capture (onCapture)="captureImage($event)"></app-camera-capture>
+    </div>
 
-  <!-- Chọn ảnh từ máy tính -->
-  <div>
-    <h2>Hoặc chọn ảnh từ máy tính</h2>
-    <input type="file" (change)="onFilesSelected($event)" multiple />
-    <button (click)="submitImage()">Gửi ảnh để nhận diện</button>
+    <!-- Chọn ảnh -->
+    <div class="card">
+      <h2><span>📤</span> Chọn ảnh từ máy tính</h2>
+      <input type="file" (change)="onFilesSelected($event)" multiple />
+      <button (click)="submitImage()">
+        <svg class="btn-icon" viewBox="0 0 24 24" width="30" height="30" >
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Gửi ảnh để nhận diện
+      </button>
+    </div>
   </div>
 
-  <!-- Form để thêm người mới (tải nhiều ảnh và nhập tên) -->
-  <div>
-    <h2>Thêm người mới</h2>
-    <input type="file" (change)="onFilesSelectedForNewPerson($event)" multiple />
-    <input type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required />
-    <button (click)="addNewPerson()">Thêm người mới</button>
+  <!-- Thêm người -->
+  <div class="card full-width">
+    <h2><span>👤</span> Thêm người mới</h2>
+    <div class="row">
+      <input type="file" (change)="onFilesSelectedForNewPerson($event)" multiple />
+      <input type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required />
+      <button (click)="addNewPerson()">Thêm người mới</button>
+    </div>
   </div>
 
-  <div *ngIf="personName">
+  <div *ngIf="personName" class="result">
     <p>Người nhận diện: {{ personName }}</p>
   </div>
 </div>
