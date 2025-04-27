@@ -11,7 +11,8 @@ export class AppComponent {
   newPersonName: string = '';
   selectedFiles: File[] = [];
   filesForNewPerson: File[] = [];
-
+  selectedFileName: string | null = null;
+  selectedFileNamePerson: String | null = null;
   constructor(private http: HttpClient) {}
 
   // Chức năng nhận diện khuôn mặt từ camera
@@ -27,6 +28,7 @@ export class AppComponent {
   // Chọn ảnh từ máy tính
   onFilesSelected(event: any) {
     this.selectedFiles = event.target.files;
+    this.selectedFileName = Array.from(this.selectedFiles).map((selectedFiles: any) => selectedFiles.name).join(', ');
   }
 
   // Gửi ảnh đã chọn lên backend để nhận diện
@@ -54,6 +56,8 @@ export class AppComponent {
   // Chọn ảnh cho người mới
   onFilesSelectedForNewPerson(event: any) {
     this.filesForNewPerson = event.target.files;
+    this.selectedFileNamePerson = Array.from(this.filesForNewPerson).map((filesForNewPerson: any) => filesForNewPerson.name).join(', ');
+
   }
 
   // Thêm người mới vào hệ thống

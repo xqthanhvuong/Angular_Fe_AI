@@ -11,14 +11,27 @@
     <!-- Chọn ảnh -->
     <div class="card">
       <h2><span>📤</span> Chọn ảnh từ máy tính</h2>
-      <input type="file" (change)="onFilesSelected($event)" multiple />
+      <div class="file-upload">
+        <label for="file-upload" class="custom-file-upload">
+          📁 Chọn ảnh
+        </label>
+        <div class="file-name" *ngIf="selectedFileName">
+          Đã chọn: {{ selectedFileName }}
+        </div>
+        <input id="file-upload" type="file" (change)="onFilesSelected($event)" multiple />
+      </div>
       <button (click)="submitImage()">
         <svg class="btn-icon" viewBox="0 0 24 24" width="30" height="30" >
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
         </svg>
-        Gửi ảnh để nhận diện
+        <span>Gửi ảnh để nhận diện</span>
       </button>
+
+      <div *ngIf="personName" class="result-text">
+        <p>Người nhận diện: {{personName}}
+        </p>
+      </div>
     </div>
   </div>
 
@@ -26,13 +39,18 @@
   <div class="card full-width">
     <h2><span>👤</span> Thêm người mới</h2>
     <div class="row">
-      <input type="file" (change)="onFilesSelectedForNewPerson($event)" multiple />
-      <input type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required />
-      <button (click)="addNewPerson()">Thêm người mới</button>
+      <div class="file-uploads">
+        <label for="file-uploads" class="custom-file-upload">
+          📁 Chọn ảnh
+        </label>
+        <div class="file-names" *ngIf="selectedFileNamePerson">
+          Đã chọn: {{ selectedFileNamePerson }}
+        </div>
+        <input id="file-uploads" type="file" (change)="onFilesSelectedForNewPerson($event)" multiple />
+      </div>
     </div>
-  </div>
-
-  <div *ngIf="personName" class="result">
-    <p>Người nhận diện: {{ personName }}</p>
+    <br/>
+    <input type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required />
+    <button (click)="addNewPerson()">Thêm người mới</button>
   </div>
 </div>

@@ -47,28 +47,16 @@
     gap: 8px;
     margin-bottom: 20px;
   }
-  
-  input[type="file"] {
-    width: 100%;
-    padding: 40px 0;
-    border: 2px dashed #f5b84f;
-    background: #fff;
-    border-radius: 8px;
-    text-align: center;
-    color: #c18c35;
-    font-size: 16px;
-    margin-bottom: 20px;
-    cursor: pointer;
-  }
 
-  input[type="text"] {
-    flex: 1;
+   input[type="text"] {
+    width: 900px;
+    display: block;
     padding: 12px;
     border: 1px solid #f5b84f;
     border-radius: 8px;
     font-size: 16px;
   }
-  
+
   button {
     background-color: #ffa500;
     color: white;
@@ -79,6 +67,11 @@
     cursor: pointer;
     transition: background-color 0.3s;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
   }
   
   button:hover {
@@ -97,4 +90,90 @@
       flex-direction: column;
     }
   }
+  .file-upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .file-uploads {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
   
+  .custom-file-button {
+    background-color: #ffa500;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+  }
+  
+  .custom-file-button:hover {
+    background-color: #ff8800;
+  }
+
+
+  .custom-file-upload {
+    cursor: pointer;
+    background-color: orange;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+}
+
+.custom-file-upload:hover {
+    background-color: #fb8c00;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.file-name {
+  max-width: 300px; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 20px;
+  color: rgb(19, 17, 17);
+
+}
+
+.file-names {
+  max-width: 4000px; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 20px;
+  color: rgb(19, 17, 17);
+
+}
+
+.result-text {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: #fff3cd; 
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  font-size: 25px;
+  font-weight: 500;
+  color: #856404;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
