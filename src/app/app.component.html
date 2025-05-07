@@ -21,10 +21,11 @@
         <input id="file-upload" type="file" (change)="onFilesSelected($event)" multiple />
       </div>
       <button (click)="submitImage()">
-        <svg class="btn-icon" viewBox="0 0 24 24" width="30" height="30" >
-          <line x1="22" y1="2" x2="11" y2="13"></line>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        <svg class="btn-icon" viewBox="0 0 24 24" width="30" height="30">
+          <line x1="22" y1="2" x2="11" y2="13" stroke="white"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2" fill="white" stroke="white"></polygon>
         </svg>
+        
         <span>Gửi ảnh để nhận diện</span>
       </button>
 
@@ -50,7 +51,7 @@
       </div>
     </div>
     <br/>
-    <input type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required />
+    <input class="w-100" type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required />
     <button (click)="addNewPerson()">Thêm người mới</button>
   </div>
 </div>

@@ -1,5 +1,25 @@
-<div>
-  <video id="video" width="640" height="480" autoplay></video>
-  <button (click)="captureImage()" class="capture-button"><i class="fa fa-camera"></i>Chụp ảnh</button>
+<div class="camera-container">
+  <!-- Video element to show the camera feed -->
+  <video id="video" width="640" height="480" autoplay class="video-feed"></video>
+  
+  <!-- Overlay for when the camera is turned off -->
+  <div id="camera-overlay" class="camera-overlay">
+    <i class="fa fa-video-slash"></i> Camera Đã Tắt
+  </div>
+  
+  <!-- Button container (for buttons below the video) -->
+  <div class="button-container">
+    <!-- Button to capture image -->
+    <button (click)="captureImage()" class="capture-button">
+      <i class="fa fa-camera"></i> Chụp ảnh
+    </button>
+    
+    <!-- Button to start/stop the camera -->
+    <button (click)="toggleCamera()" class="toggle-camera-button">
+      <i class="fa fa-video-camera"></i> Bật/Tắt Camera
+    </button>
+  </div>
+  
+  <!-- Canvas to capture image -->
   <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
 </div>
