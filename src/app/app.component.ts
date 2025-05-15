@@ -11,12 +11,29 @@ export class AppComponent {
   newPersonName: string = '';
   selectedFiles: File[] = [];
   filesForNewPerson: File[] = [];
-  selectedFileName: string | null = null;
   selectedFileNamePerson: String | null = null;
   capturedFile: File | null = null;
+  imagePreviewUrl: string | null = null;
+  selectedFileNames: string | null = null;
+  selectedImages: string[] = [];
 
   constructor(private http: HttpClient) {}
 
+
+  // Chọn ảnh từ máy tính
+onFilesSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    const file = input.files[0];
+    this.selectedFileNames = file.name;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreviewUrl = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+}
   // Chức năng nhận diện khuôn mặt từ camera
   captureImage(imageUrl: string) {
     fetch(imageUrl)
@@ -24,20 +41,18 @@ export class AppComponent {
       .then(blob => {
         const file = new File([blob], "camera.jpg", { type: "image/jpeg" });
         this.capturedFile = file;
-  
+
+        const reader = new FileReader();
+        reader.onload = () => {
+        this.imagePreviewUrl = reader.result as string;
+      };
+      reader.readAsDataURL(file);
         // Sau khi đã có file, gọi submitImage
         this.submitImage();
       })
       .catch(err => {
         console.error("Lỗi capture ảnh từ camera:", err);
       });
-  }
-  
-
-  // Chọn ảnh từ máy tính
-  onFilesSelected(event: any) {
-    this.selectedFiles = event.target.files;
-    this.selectedFileName = Array.from(this.selectedFiles).map((selectedFiles: any) => selectedFiles.name).join(', ');
   }
 
   // Gửi ảnh đã chọn lên backend để nhận diện
@@ -71,9 +86,19 @@ export class AppComponent {
 
   // Chọn ảnh cho người mới
   onFilesSelectedForNewPerson(event: any) {
-    this.filesForNewPerson = event.target.files;
-    this.selectedFileNamePerson = Array.from(this.filesForNewPerson).map((filesForNewPerson: any) => filesForNewPerson.name).join(', ');
-
+    const files = event.target.files;
+    this.selectedImages = [];
+  
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.selectedImages.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
   }
 
   // Thêm người mới vào hệ thống

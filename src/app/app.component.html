@@ -15,8 +15,8 @@
         <label for="file-upload" class="custom-file-upload">
           📁 Chọn ảnh
         </label>
-        <div class="file-name" *ngIf="selectedFileName">
-          Đã chọn: {{ selectedFileName }}
+        <div class="image-preview" *ngIf="imagePreviewUrl">
+          <img [src]="imagePreviewUrl" alt="Ảnh đã chọn" />
         </div>
         <input id="file-upload" type="file" (change)="onFilesSelected($event)" multiple />
       </div>
@@ -44,11 +44,11 @@
         <label for="file-uploads" class="custom-file-upload">
           📁 Chọn ảnh
         </label>
-        <div class="file-names" *ngIf="selectedFileNamePerson">
-          Đã chọn: {{ selectedFileNamePerson }}
-        </div>
         <input id="file-uploads" type="file" (change)="onFilesSelectedForNewPerson($event)" multiple />
       </div>
+    </div>
+    <div class="image-previews" *ngIf="selectedImages && selectedImages.length > 0">
+      <img *ngFor="let img of selectedImages" [src]="img" alt="Ảnh đã chọn" />
     </div>
     <br/>
     <input class="w-100" type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required />
