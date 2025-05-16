@@ -8,7 +8,7 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
       <div class="border-b border-gray-200">
         <nav class="flex">
-          <button (click)="activeTab = 'camera'" [ngClass]="{'border-blue-500 text-blue-600': activeTab === 'camera', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'camera'}" class="py-4 px-6 font-medium border-b-2 -mb-px">
+          <button (click)="setActiveTab('camera')" [ngClass]="{'border-blue-500 text-blue-600': activeTab === 'camera', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'camera'}" class="py-4 px-6 font-medium border-b-2 -mb-px">
             <span class="flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -17,7 +17,7 @@
               Chụp ảnh
             </span>
           </button>
-          <button (click)="activeTab = 'upload'" [ngClass]="{'border-blue-500 text-blue-600': activeTab === 'upload', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'upload'}" class="py-4 px-6 font-medium border-b-2 -mb-px">
+          <button (click)="setActiveTab('upload')" [ngClass]="{'border-blue-500 text-blue-600': activeTab === 'upload', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'upload'}" class="py-4 px-6 font-medium border-b-2 -mb-px">
             <span class="flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -25,7 +25,7 @@
               Tải ảnh lên
             </span>
           </button>
-          <button (click)="activeTab = 'addPerson'" [ngClass]="{'border-blue-500 text-blue-600': activeTab === 'addPerson', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'addPerson'}" class="py-4 px-6 font-medium border-b-2 -mb-px">
+          <button (click)="setActiveTab('addPerson')" [ngClass]="{'border-blue-500 text-blue-600': activeTab === 'addPerson', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'addPerson'}" class="py-4 px-6 font-medium border-b-2 -mb-px">
             <span class="flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 13h-6v-6h-4v6h-6v4h6v6h4v-6h6v-4z" />
@@ -38,17 +38,17 @@
 
       <div class="p-6">
         <div *ngIf="activeTab === 'camera'">
-          <app-camera-capture (onCapture)="captureImage($event)"></app-camera-capture>
+          <app-camera-capture #mainCamera (onCapture)="captureImage($event)"></app-camera-capture>
         </div>
 
-        <div *ngIf="activeTab === 'upload'" class="flex flex-col items-center">
+        <div *ngIf="activeTab === 'upload'" class="flex flex-col items-center" >
           <div 
             [ngClass]="{
               'bg-gray-100 border-blue-400': isDraggingOver, 
               'bg-white': !isDraggingOver,
               'hidden': hasSelectedImages
             }"
-            class="w-full max-w-md h-40 hover:border-blue-500 border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer transition-all duration-200"
+            class="w-[500px] h-[300px] hover:border-blue-500 border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer transition-all duration-200"
             (click)="fileInput.click()"
             (dragover)="handleDragOver($event)"
             (dragenter)="handleDragEnter($event)"
@@ -78,9 +78,20 @@
             class="hidden"
           />
           
-          <div *ngIf="imagePreviewUrl" class="w-full max-w-md mb-6 overflow-hidden rounded-lg shadow-md">
-            <img [src]="imagePreviewUrl" alt="Ảnh đã chọn" class="w-full h-auto object-cover" />
+          <div *ngIf="imagePreviewUrl" class="relative w-full mb-6 rounded-lg shadow-md" style="height: 300px; width: 500px;">
+            <img [src]="imagePreviewUrl" alt="Ảnh đã chọn" class="w-full h-full object-cover" />
+            <button 
+              (click)="clearUploadImage()" 
+              class="absolute -top-2 -right-2 bg-gray-100 hover:bg-gray-200 text-black rounded-full w-6 h-6 flex items-center justify-center transition duration-200"
+              title="Xóa ảnh này">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
+          
+
           
           <button (click)="submitImage()" class="w-full max-w-md mt-5 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center">
             <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -96,56 +107,148 @@
         </div>
 
         <div *ngIf="activeTab === 'addPerson'" class="flex flex-col items-center">
-          <div 
-            [ngClass]="{
-              'bg-gray-100 border-blue-400': isDraggingOverNewPerson, 
-              'bg-white': !isDraggingOverNewPerson,
-              'hidden': hasSelectedImageForNewPerson
-            }"
-            class="w-full max-w-md h-40 hover:border-blue-500 border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer transition-all duration-200 mb-6"
-            (click)="fileUploads.click()"
-            (dragover)="handleDragOverNewPerson($event)"
-            (dragenter)="handleDragEnterNewPerson($event)"
-            (dragleave)="handleDragLeaveNewPerson($event)"
-            (drop)="handleDropNewPerson($event)"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" 
-                [ngClass]="{'text-blue-500': isDraggingOverNewPerson, 'text-gray-400': !isDraggingOverNewPerson}"
-                class="w-10 h-10 mb-2 transition-colors" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p class="text-center text-sm text-gray-500 mb-1">
-              {{ isDraggingOverNewPerson ? 'Thả để tải ảnh lên' : 'Kéo và thả hình ảnh hoặc nhấp để tải lên' }}
-            </p>
-            <p class="text-center text-xs text-gray-500">
-              Hỗ trợ JPG, PNG, GIF (có thể chọn nhiều ảnh)
-            </p>
+          <div class="w-full max-w-md mb-6">
+            <input type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required 
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
           </div>
           
-          <input 
-            #fileUploads
-            id="file-uploads" 
-            type="file" 
-            accept="image/*"
-            (change)="onFilesSelectedForNewPerson($event)" 
-            class="hidden" 
-            multiple 
-          />
+          <div class="w-full max-w-md mb-6 flex space-x-2">
+            <button 
+              (click)="isCapturingForNewPerson = false; hasSelectedImageForNewPerson = false" 
+              [ngClass]="{'bg-blue-600 text-white': !isCapturingForNewPerson, 'bg-gray-200 text-gray-700': isCapturingForNewPerson}"
+              class="flex-1 py-2 px-4 rounded-lg hover:bg-blue-700 hover:text-white transition duration-200 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>Tải ảnh lên</span>
+            </button>
+            <button 
+              (click)="toggleCameraForNewPerson()" 
+              [ngClass]="{'bg-blue-600 text-white': isCapturingForNewPerson, 'bg-gray-200 text-gray-700': !isCapturingForNewPerson}"
+              class="flex-1 py-2 px-4 rounded-lg hover:bg-blue-700 hover:text-white transition duration-200 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Chụp ảnh</span>
+            </button>
+          </div>
           
-          <div *ngIf="selectedImages && selectedImages.length > 0" class="w-full max-w-md mb-6">
-            <p class="text-sm text-gray-500 mb-2">Đã chọn {{selectedImages.length}} ảnh:</p>
-            <div class="flex flex-wrap gap-2 justify-center">
-              <img *ngFor="let img of selectedImages" [src]="img" alt="Ảnh đã chọn" class="w-20 h-20 object-cover rounded-md shadow-sm" />
+          <div *ngIf="isCapturingForNewPerson" class="w-full max-w-4xl mb-6 flex flex-row">
+            <div [ngClass]="{'w-1/2': selectedImages.length > 0}" class="w-full">
+              <app-camera-capture 
+                #newPersonCamera
+                [isMultipleCapture]="true" 
+                (onCapture)="captureImageForNewPerson($event)"
+                (onDeleteImage)="deleteImageForNewPerson($event)">
+              </app-camera-capture>
+            </div>
+            
+            <div *ngIf="selectedImages && selectedImages.length > 0" class="w-1/2 pl-4">
+              <div class="bg-white p-4 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-2">
+                  <p class="text-lg font-medium text-gray-800">Đã chụp {{selectedImages.length}} ảnh:</p>
+                  <button 
+                    (click)="clearImagesForNewPerson()" 
+                    class="text-xs bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded flex items-center transition-colors duration-200"
+                    title="Xóa tất cả ảnh">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    Xóa tất cả
+                  </button>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <div *ngFor="let img of selectedImages; let i = index" class="relative">
+                    <img [src]="img" alt="Ảnh đã chụp" class="w-full h-20 object-cover rounded-md shadow-sm" />
+                    <button 
+                      (click)="deleteImageForNewPerson(i)" 
+                      class="absolute -top-2 -right-2 bg-gray-100 hover:bg-gray-200 text-black rounded-full w-6 h-6 flex items-center justify-center transition duration-200"
+                      title="Xóa ảnh này">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div class="w-full max-w-md space-y-4">
-            <input type="text" [(ngModel)]="newPersonName" placeholder="Nhập tên người mới" required 
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+          <div *ngIf="!isCapturingForNewPerson">
+            <div 
+              [ngClass]="{
+                'bg-gray-100 border-blue-400': isDraggingOverNewPerson, 
+                'bg-white': !isDraggingOverNewPerson,
+                'hidden': hasSelectedImageForNewPerson
+              }"
+              class="w-[400px] h-40 hover:border-blue-500 border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer transition-all duration-200 mb-6"
+              (click)="fileUploads.click()"
+              (dragover)="handleDragOverNewPerson($event)"
+              (dragenter)="handleDragEnterNewPerson($event)"
+              (dragleave)="handleDragLeaveNewPerson($event)"
+              (drop)="handleDropNewPerson($event)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                  [ngClass]="{'text-blue-500': isDraggingOverNewPerson, 'text-gray-400': !isDraggingOverNewPerson}"
+                  class="w-10 h-10 mb-2 transition-colors" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p class="text-center text-sm text-gray-500 mb-1">
+                {{ isDraggingOverNewPerson ? 'Thả để tải ảnh lên' : 'Kéo và thả hình ảnh hoặc nhấp để tải lên' }}
+              </p>
+              <p class="text-center text-xs text-gray-500">
+                Hỗ trợ JPG, PNG, GIF (có thể chọn nhiều ảnh)
+              </p>
+            </div>
             
+            <input 
+              #fileUploads
+              id="file-uploads" 
+              type="file" 
+              accept="image/*"
+              (change)="onFilesSelectedForNewPerson($event)" 
+              class="hidden" 
+              multiple 
+            />
+            
+            <div *ngIf="selectedImages && selectedImages.length > 0" class="w-full max-w-lg mb-6">
+              <div class="bg-white p-4 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-2">
+                  <p class="text-lg font-medium text-gray-800">Đã chọn {{selectedImages.length}} ảnh:</p>
+                  <button 
+                    (click)="clearImagesForNewPerson()" 
+                    class="text-xs bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded flex items-center transition-colors duration-200"
+                    title="Xóa tất cả ảnh">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    Xóa tất cả
+                  </button>
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                  <div *ngFor="let img of selectedImages; let i = index" class="relative">
+                    <img [src]="img" alt="Ảnh đã chọn" class="w-full h-20 object-cover rounded-md shadow-sm" />
+                    <button 
+                      (click)="deleteImageForNewPerson(i)" 
+                      class="absolute -top-2 -right-2 bg-gray-100 hover:bg-gray-200 text-black rounded-full w-6 h-6 flex items-center justify-center transition duration-200"
+                      title="Xóa ảnh này">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="w-full max-w-md">
             <button (click)="addNewPerson()" 
                     class="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
               Thêm người mới
