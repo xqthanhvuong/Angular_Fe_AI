@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 
 @Component({
   selector: 'app-camera-capture',
@@ -7,12 +7,15 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class CameraCaptureComponent {
   @Output() onCapture: EventEmitter<string> = new EventEmitter();
+  @Output() onDeleteImage: EventEmitter<number> = new EventEmitter(); // Thêm event để thông báo khi xóa ảnh
+  @Input() isMultipleCapture: boolean = false; // Thêm input để biết có cho phép chụp nhiều ảnh hay không
 
   videoElement: any;
   canvasElement: any;
   context: any;
   isCameraOn: boolean = false; // Trạng thái camera
   videoStream: MediaStream | null = null; // Biến lưu stream của video
+  capturedImages: string[] = []; // Mảng lưu URL ảnh đã chụp (cho chế độ nhiều ảnh)
 
   ngOnInit(): void {
     this.videoElement = document.getElementById('video') as HTMLVideoElement;
@@ -27,7 +30,7 @@ export class CameraCaptureComponent {
       this.videoElement.srcObject = stream;
       this.videoStream = stream;
       this.isCameraOn = true;
-      this.toggleOverlay(false); // Ẩn overlay khi bật camera
+      // this.toggleOverlay(false); // Ẩn overlay khi bật camera
     }).catch((err) => {
       console.error("Lỗi khi mở camera: ", err);
       alert("Không thể mở camera.");
@@ -42,7 +45,7 @@ export class CameraCaptureComponent {
       this.videoElement.srcObject = null;
       this.videoStream = null;
       this.isCameraOn = false;
-      this.toggleOverlay(true); // Hiển thị overlay khi tắt camera
+      // this.toggleOverlay(true); // Hiển thị overlay khi tắt camera
     }
   }
 
@@ -56,14 +59,42 @@ export class CameraCaptureComponent {
   }
 
   // Hàm để điều khiển hiển thị overlay
-  toggleOverlay(show: boolean) {
-    const overlay = document.getElementById('camera-overlay') as HTMLDivElement;
-    overlay.style.display = show ? 'flex' : 'none';
-  }
+  // toggleOverlay(show: boolean) {
+  //   const overlay = document.getElementById('camera-overlay') as HTMLDivElement;
+  //   overlay.style.display = show ? 'flex' : 'none';
+  // }
 
   captureImage() {
     this.context.drawImage(this.videoElement, 0, 0, this.canvasElement.width, this.canvasElement.height);
     const imageUrl = this.canvasElement.toDataURL('image/jpeg');
-    this.onCapture.emit(imageUrl); // Gửi ảnh đã chụp ra ngoài component
+    
+    if (this.isMultipleCapture) {
+      if (this.capturedImages.length < 12) {
+        this.capturedImages.push(imageUrl);
+      } else {
+        alert("Bạn chỉ được chụp tối đa 12 ảnh.");
+        return;
+      }
+    }
+    
+    this.onCapture.emit(imageUrl); 
+  }
+  
+  // Xóa một ảnh cụ thể
+  deleteImage(index: number) {
+    if (this.isMultipleCapture) {
+      // Nếu đang ở chế độ multi-capture, thông báo cho component cha biết
+      this.onDeleteImage.emit(index);
+    } else {
+      // Xóa ảnh trong component nếu không phải chế độ multi-capture
+      if (index >= 0 && index < this.capturedImages.length) {
+        this.capturedImages.splice(index, 1);
+      }
+    }
+  }
+  
+  // Xóa tất cả các ảnh đã chụp
+  clearCapturedImages() {
+    this.capturedImages = [];
   }
 }

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CameraCaptureComponent } from './camera-capture/camera-capture.component';
 
 @Component({
   selector: 'app-root',
@@ -7,6 +8,11 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
+  @ViewChild('newPersonCamera') newPersonCamera?: CameraCaptureComponent;
+  @ViewChild('fileUploads') fileUploadsInput?: ElementRef;
+  @ViewChild('fileInput') fileInput?: ElementRef;
+  @ViewChild('mainCamera') mainCamera?: CameraCaptureComponent;
+  
   activeTab: string = 'upload';
   personName: string | null = null;
   newPersonName: string = '';
@@ -21,8 +27,29 @@ export class AppComponent {
   isDraggingOverNewPerson: boolean = false;
   hasSelectedImages: boolean = false;
   hasSelectedImageForNewPerson: boolean = false;
+  isCapturingForNewPerson: boolean = false; 
 
   constructor(private http: HttpClient) {}
+
+  // Phương thức để chuyển tab và xử lý camera
+  setActiveTab(tabName: string): void {
+    const previousTab = this.activeTab;
+    this.activeTab = tabName;
+    
+    // Tắt camera khi chuyển từ tab camera sang tab khác
+    if (previousTab === 'camera' && tabName !== 'camera') {
+      if (this.mainCamera) {
+        this.mainCamera.stopCamera();
+      }
+    }
+    
+    // Tắt camera khi chuyển từ tab addPerson (đang chụp ảnh) sang tab khác
+    if (previousTab === 'addPerson' && tabName !== 'addPerson' && this.isCapturingForNewPerson) {
+      if (this.newPersonCamera) {
+        this.newPersonCamera.stopCamera();
+      }
+    }
+  }
 
   // Chọn ảnh từ máy tính
   onFilesSelected(event: Event): void {
@@ -50,6 +77,12 @@ export class AppComponent {
         const file = new File([blob], 'camera.jpg', { type: 'image/jpeg' });
         this.capturedFile = file;
         this.hasSelectedImages = true;
+        
+        // Tắt camera trước khi chuyển tab
+        if (this.mainCamera) {
+          this.mainCamera.stopCamera();
+        }
+        
         this.activeTab = 'upload';
 
         const reader = new FileReader();
@@ -62,6 +95,69 @@ export class AppComponent {
         alert('Lỗi chụp ảnh từ camera');
         console.error('Lỗi capture ảnh từ camera:', err);
       });
+  }
+  
+  // Xử lý khi chụp ảnh cho người mới
+  captureImageForNewPerson(imageUrl: string) {
+    fetch(imageUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const fileName = `new_person_${Date.now()}.jpg`;
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        this.filesForNewPerson.push(file);
+        this.hasSelectedImageForNewPerson = true;
+        
+        // Thêm vào danh sách ảnh hiển thị
+        this.selectedImages.push(imageUrl);
+      })
+      .catch((err) => {
+        alert('Lỗi chụp ảnh từ camera');
+        console.error('Lỗi capture ảnh từ camera:', err);
+      });
+  }
+  
+  // Xóa một ảnh đã chụp cho người mới
+  deleteImageForNewPerson(index: number) {
+    if (index >= 0 && index < this.selectedImages.length) {
+      this.filesForNewPerson.splice(index, 1);
+      this.selectedImages.splice(index, 1);
+      
+      if (this.fileUploadsInput && this.fileUploadsInput.nativeElement) {
+        this.fileUploadsInput.nativeElement.value = '';
+      }
+      
+      if (this.selectedImages.length === 0) {
+        this.hasSelectedImageForNewPerson = false;
+      }
+    }
+  }
+  
+  clearImagesForNewPerson() {
+    this.selectedImages = [];
+    this.filesForNewPerson = [];
+    this.hasSelectedImageForNewPerson = false;
+    
+    if (this.fileUploadsInput && this.fileUploadsInput.nativeElement) {
+      this.fileUploadsInput.nativeElement.value = '';
+    }
+    
+    if (this.newPersonCamera) {
+      this.newPersonCamera.clearCapturedImages();
+    }
+  }
+  
+  toggleCameraForNewPerson() {
+    this.isCapturingForNewPerson = !this.isCapturingForNewPerson;
+    
+    if (this.isCapturingForNewPerson) {
+      this.selectedImages = [];
+      this.filesForNewPerson = [];
+      this.hasSelectedImageForNewPerson = false;
+    } else {
+      if (this.newPersonCamera) {
+        this.newPersonCamera.clearCapturedImages();
+      }
+    }
   }
 
   submitImage() {
@@ -128,10 +224,19 @@ export class AppComponent {
 
     this.http.post('http://localhost:5000/add_person', formData).subscribe(
       (response: any) => {
-        console.log('Đã thêm người mới:', response);
+        alert('Đã thêm người mới thành công!');
+        this.newPersonName = '';
+        this.filesForNewPerson = [];
+        this.selectedImages = [];
+        this.hasSelectedImageForNewPerson = false;
+        this.isCapturingForNewPerson = false;
+        if (this.newPersonCamera) {
+          this.newPersonCamera.clearCapturedImages();
+        }
       },
       (error) => {
         console.error('Lỗi thêm người mới:', error);
+        alert('Lỗi khi thêm người mới. Vui lòng thử lại!');
       }
     );
   }
@@ -217,6 +322,21 @@ export class AppComponent {
           reader.readAsDataURL(file);
         }
       }
+    }
+  }
+
+  // Xóa ảnh đã chọn và reset form trong tab upload
+  clearUploadImage() {
+    this.imagePreviewUrl = null;
+    this.selectedFiles = [];
+    this.capturedFile = null;
+    this.selectedFileNames = null;
+    this.hasSelectedImages = false;
+    this.personName = null;
+    
+    // Reset input file để có thể chọn lại file đã xóa
+    if (this.fileInput && this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.value = '';
     }
   }
 }
