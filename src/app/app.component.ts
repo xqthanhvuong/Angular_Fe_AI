@@ -28,6 +28,7 @@ export class AppComponent {
   hasSelectedImages: boolean = false;
   hasSelectedImageForNewPerson: boolean = false;
   isCapturingForNewPerson: boolean = false; 
+  loading: boolean = false;
 
   constructor(private http: HttpClient) {}
 
@@ -78,7 +79,6 @@ export class AppComponent {
         this.capturedFile = file;
         this.hasSelectedImages = true;
         
-        // Tắt camera trước khi chuyển tab
         if (this.mainCamera) {
           this.mainCamera.stopCamera();
         }
@@ -107,7 +107,6 @@ export class AppComponent {
         this.filesForNewPerson.push(file);
         this.hasSelectedImageForNewPerson = true;
         
-        // Thêm vào danh sách ảnh hiển thị
         this.selectedImages.push(imageUrl);
       })
       .catch((err) => {
@@ -161,6 +160,7 @@ export class AppComponent {
   }
 
   submitImage() {
+    this.loading = true;
     const formData = new FormData();
     let fileToSend: File | null = null;
 
@@ -177,13 +177,16 @@ export class AppComponent {
         (response: any) => {
           this.personName = response.person;
           console.log('Nhận diện người:', this.personName);
+          this.loading = false;
         },
         (error) => {
           console.error('Lỗi gửi ảnh:', error);
+          this.loading = false;
         }
       );
     } else {
       console.log('Không có ảnh nào để gửi!');
+      this.loading = false;
     }
   }
 
@@ -214,6 +217,8 @@ export class AppComponent {
       return;
     }
 
+    this.loading = true;
+
     const formData = new FormData();
     formData.append('name', this.newPersonName);
 
@@ -233,10 +238,12 @@ export class AppComponent {
         if (this.newPersonCamera) {
           this.newPersonCamera.clearCapturedImages();
         }
+        this.loading = false;
       },
       (error) => {
         console.error('Lỗi thêm người mới:', error);
         alert('Lỗi khi thêm người mới. Vui lòng thử lại!');
+        this.loading = false;
       }
     );
   }
